@@ -9,49 +9,50 @@
 
 function WallFollow(serPort)
 
-% Move EVE forward until she hits a wall
-while(WallSensorReadRoomba(serPort)== 0)
-     SetFwdVelRadiusRoomba(serPort, 0.5, inf);
-     pause(0.1);
-end
-
-% used to keep track of position
-initialX = 0;
-initialY = 0;
-currentX = 1;
-currentY = 1;
-
-% line up to move against wall
-while(WallSensorReadRoomba(serPort)==1)
-    turnAngle(serPort, 0.2, -5);
-end
-
-% keep track of distance and angles
-angle = AngleSensorRoomba(serPort);
-magnitude = DistanceSensorRoomba(serPort);
-
-% loop through until you return to starting position
-while(currentX != initialX && currentY != initialY)
-    currentX = 0;
-    currentY = 0;
-    [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
-    CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
-    DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
-    Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
-    
-    % continue moving until no longer along the wall
-    while(BumpRight==0 && BumpLeft==0 && BumpFront==0 && Wall==1)
-        SetFwdVelRadiusRoomba(serPort, 0.5, inf);
-        pause(0.1);
+    % Move EVE forward until she hits a wall
+    while(WallSensorReadRoomba(serPort)== 0)
+         SetFwdVelRadiusRoomba(serPort, 0.5, inf);
+         pause(0.1);
     end
-    
-    % do vector math to keep track of changes in position
+
+    % used to keep track of position
+    initialX = 0;
+    initialY = 0;
+    currentX = 1;
+    currentY = 1;
+
+    % line up to move against wall
+    while(WallSensorReadRoomba(serPort)==1)
+        turnAngle(serPort, 0.2, -5);
+    end
+
+    % keep track of distance and angles
+    angle = AngleSensorRoomba(serPort);
     magnitude = DistanceSensorRoomba(serPort);
-    newAngle = angle + AngleSensorRoomba(serPort);
-    currentX = currentX + magnitude * cosd(newAngle);
-    currentY = currentY + magnitude * sind(newAngle);
-    
-    
+
+    % loop through until you return to starting position
+    while ((currentX ~= initialX) && (currentY ~= initialY))
+        currentX = 0;
+        currentY = 0;
+        [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
+        CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
+        DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
+        Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
+
+        % continue moving until no longer along the wall
+        while(BumpRight==0 && BumpLeft==0 && BumpFront==0 && Wall==1)
+            SetFwdVelRadiusRoomba(serPort, 0.5, inf);
+            pause(0.1);
+        end
+
+        % do vector math to keep track of changes in position
+        magnitude = DistanceSensorRoomba(serPort);
+        newAngle = angle + AngleSensorRoomba(serPort);
+        currentX = currentX + magnitude * cosd(newAngle);
+        currentY = currentY + magnitude * sind(newAngle);
+    end
+    disp "End of loop";
+end
     
     
     
