@@ -8,10 +8,12 @@
 %**********************************************
 
 function WallFollow(serPort)
+    
+    max_vel = 0.4;
 
     % Move EVE forward until she hits a wall
     while(WallSensorReadRoomba(serPort)== 0)
-         SetFwdVelRadiusRoomba(serPort, 0.5, inf);
+         SetFwdVelRadiusRoomba(serPort, max_vel, inf);
          pause(0.1);
     end
 
@@ -24,14 +26,16 @@ function WallFollow(serPort)
     % line up to move against wall
     while(WallSensorReadRoomba(serPort)==1)
         turnAngle(serPort, 0.2, -5);
+        disp('Point One');
     end
-
+    disp('Point Two');
     % keep track of distance and angles
     angle = AngleSensorRoomba(serPort);
     magnitude = DistanceSensorRoomba(serPort);
 
     % loop through until you return to starting position
     while ((currentX ~= initialX) && (currentY ~= initialY))
+        disp('Point Three');
         currentX = 0;
         currentY = 0;
         [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
@@ -41,17 +45,18 @@ function WallFollow(serPort)
 
         % continue moving until no longer along the wall
         while(BumpRight==0 && BumpLeft==0 && BumpFront==0 && Wall==1)
-            SetFwdVelRadiusRoomba(serPort, 0.5, inf);
+            disp('Point Four');
+            SetFwdVelRadiusRoomba(serPort, max_vel, inf);
             pause(0.1);
         end
-
+        disp('Point Five');
         % do vector math to keep track of changes in position
         magnitude = DistanceSensorRoomba(serPort);
         newAngle = angle + AngleSensorRoomba(serPort);
         currentX = currentX + magnitude * cosd(newAngle);
         currentY = currentY + magnitude * sind(newAngle);
     end
-    disp "End of loop";
+    disp('Point Six');
 end
     
     
