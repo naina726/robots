@@ -78,7 +78,6 @@ function WallFollow(serPort)
         disp(['currentY is ' num2str(currentY)])
         disp(['magnitude is ' num2str(magnitude)])
         disp(['angle is ' num2str(angle)])
-end
 
     % keep track of distance and anglesa
     % angle = AngleSensorRoomba(serPort);
