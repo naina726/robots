@@ -1,0 +1,64 @@
+lastAngle = 0
+lastDist = 0
+
+while you have not returned to the starting point
+	while bump=0 
+		while wall=1
+			go forward 
+			pause
+		end
+		%readjust angle
+
+	end
+	call distance function
+	compute current relative position WRT dist/ang
+
+	while bumper != 0 || wall != 1
+		stop moving
+		if bumper == 0 && wall == 0
+			turn right 5 degrees
+		else 
+			turn left 5 degrees
+		end?
+	end
+
+	call angle function
+	compute current relative position WRT dist/ang
+
+	setforwardvelocity to move
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+while not return to the start point:
+
+	while bumper == 0 and wall == 1:
+		go_straght_forward()
+
+	while bumper!=0 or wall!=1:
+		if bumper == 0 and wall == 0:
+			trun_right(5)
+		if bumper == 1 and wall == 0:
+			turn_left(5)
+		if bumper == 1 and wall == 1:
+			turn_left(5)
+
+
+
+
+
+
+
+
+FROM OLD FILE
+%   [ BumpRight, BumpLeft, WheelDropRight, WheelDropLeft, WheelDropCastor, BumpFront ] = BumpsWheelDropsSensorsRoomba(serPort); % Read Bumpers
+%   tStart= tic;                                        % Time limit marker
+%   maxDuration = 4;                                   % 20 seconds of max duration time    
+%   
+%   while toc(tStart) < maxDuration
+%      SetFwdVelRadiusRoomba(serPort, 0.5, inf);
+%      Total_Distance = 0;
+%      pause(1);
+%   end
+	
+	

@@ -20,13 +20,16 @@ function WallFollow(serPort)
     initialY = 0;
     currentX = 1;
     currentY = 1;
-
+    angle = AngleSensorRoomba(serPort);
+    disp(angle);
+    
     % line up to move against wall
     while(WallSensorReadRoomba(serPort)==1)
         turnAngle(serPort, 0.2, -5);
         disp('Point One');
     end
     disp('Point Two');
+    
     % keep track of distance and angles
     angle = AngleSensorRoomba(serPort);
     magnitude = DistanceSensorRoomba(serPort);
