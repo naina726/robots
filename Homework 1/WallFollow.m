@@ -4,9 +4,7 @@
 % Yiqing Cui (yc3121)
 % Team 21
 % Homework 1
-%
 %**********************************************
-
 function WallFollow(serPort)
     
     max_vel = 0.4;
