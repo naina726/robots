@@ -36,11 +36,12 @@ function WallFollow(serPort)
     % used to keep track of position
     initialX = 0;
     initialY = 0;
-    currentX = 1;
-    currentY = 1;
+    currentX = 0;
+    currentY = 0;
     hasStart = 0;
+    
     angle = AngleSensorRoomba(serPort);
-    %disp(angle);
+    disp(['first time angle is' num2str(angle)]);
     
     % stop forward movement
     %SetFwdVelRadiusRoomba(serPort, 0, inf);
@@ -56,25 +57,45 @@ function WallFollow(serPort)
           DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
           Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
     end
+    angle = angle + AngleSensorRoomba(serPort);
+    
+    while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1)
+         SetFwdVelRadiusRoomba(serPort, max_vel, inf);
+         pause(0.1);
+         %disp('after pause')
+         [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
+          CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
+          DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
+          Volts, Current, Temp, Charge, ~, pCharge] = AllSensorsReadRoomba(serPort);
+          disp('point one')
+    end
+    
+        magnitude = DistanceSensorRoomba(serPort);
+        currentX = currentX + magnitude * cos(angle);
+        currentY = currentY + magnitude * sin(angle);
+        
+        disp(['outside the loop, currentX is ' num2str(currentX)]);
+        disp(['currentY is ' num2str(currentY)])
+        disp(['magnitude is ' num2str(magnitude)])
+        disp(['angle is ' num2str(angle)])
+end
 
     % keep track of distance and anglesa
-    angle = AngleSensorRoomba(serPort);
-    magnitude = DistanceSensorRoomba(serPort);
+    % angle = AngleSensorRoomba(serPort);
+    % magnitude = DistanceSensorRoomba(serPort);
 
     % loop through until you return to starting position
-    while (currentX ~= initialX || currentY ~= initialY || hasStart == 0)
+    while (IsStartPoint(currentX, currentY, initialX,  initialY) == 0 || hasStart == 0)
         hasStart = 1
-        disp('Point Three');
-       
-    
+
         [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
         CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
         DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
         Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
 
-
-
-        while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1)
+    
+        while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1 && ...
+            IsStartPoint(currentX, currentY, initialX,  initialY) == 0)
              SetFwdVelRadiusRoomba(serPort, max_vel, inf);
              pause(0.1);
              %disp('after pause')
@@ -82,6 +103,10 @@ function WallFollow(serPort)
               CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
               DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
               Volts, Current, Temp, Charge, ~, pCharge] = AllSensorsReadRoomba(serPort);
+              disp('point one')
+            magnitude = DistanceSensorRoomba(serPort);
+            currentX = currentX + magnitude * cos(angle);
+            currentY = currentY + magnitude * sin(angle);
 
         end
         disp('after first loop')
@@ -93,10 +118,14 @@ function WallFollow(serPort)
                 CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
                 DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
                 Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
+        disp('point two')
 
-        end  
-        disp('after second loop')
-        disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])        
+           
+        end
+
+        % angle = angle + AngleSensorRoomba(serPort);  
+        % disp('after second loop')
+        % disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])        
         
         % while (Wall == 0 && BumpRight==0)
         %     %turnAngle(serPort, 0.2, -5);
@@ -116,26 +145,44 @@ function WallFollow(serPort)
                 DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
                 Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
              disp('inside third loop')
+
         end
+
+
+        % angle = angle + AngleSensorRoomba(serPort);
+        % magnitude = DistanceSensorRoomba(serPort);
+        % currentX = currentX + magnitude * cos(angle);
+        % currentY = currentY + magnitude * sin(angle);
         disp('after third loop')
-        disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])        
+        disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])   
+
+
+
+        disp(['inside the loop, currentX is ' num2str(currentX)]);
+        disp(['currentY is ' num2str(currentY)])
+        disp(['angle is ' num2str(angle)])
         
        
-        
 
-        magnitude = DistanceSensorRoomba(serPort);
-        newAngle = angle + AngleSensorRoomba(serPort);
-        currentX = currentX + magnitude * cosd(newAngle);
-        currentY = currentY + magnitude * sind(newAngle);
+
+
+
     end
     
-    disp(['outside the loop, currentX is ' num2str(currentX)]);
-    disp(['currentY is ' num2str(currentY)])
-    disp(['hasStart is ' num2str(hasStart)])
+    % disp(['outside the loop, currentX is ' num2str(currentX)]);
+    % disp(['currentY is ' num2str(currentY)])
+    % disp(['hasStart is ' num2str(hasStart)])
+
 end
     
     
     
+function isStartPoint = IsStartPoint(currentX, currentY, initialX, initialY)
+    isStartPoint ...
+        = (currentX - initialX)^2 + (currentY - initialY)^2 < 0.72
+end
+  
+ 
  
     
     
