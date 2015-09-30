@@ -5,164 +5,115 @@
 % Team 21
 % Homework 1
 %**********************************************
+
 function WallFollow(serPort)
-    
-    max_vel = 0.4;
-    
-    [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
-    CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
-    DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
-    Volts, Current, Temp, Charge, Capacity, pCharge] = AllSensorsReadRoomba(serPort);
-    
-
-
+   % Set the max Velocity 
+   max_vel = 0.4;
+   
+   [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
+   [Wall]= WallSensorReadRoomba(serPort);
 
     % Move EVE forward until she hits a wall
     while (BumpRight==0 && BumpLeft==0 && BumpFront == 0)
          SetFwdVelRadiusRoomba(serPort, max_vel, inf);
-         %SetFwdVelRadiusRoomba(serPort, max_vel, -1);
-
          pause(0.1);
-         %disp('after pause')
-         [BumpRight, BumpLeft, BumpFront, Wall, virtWall, CliffLft, ...
-          CliffRgt, CliffFrntLft, CliffFrntRgt, LeftCurrOver, RightCurrOver, ...
-          DirtL, DirtR, ButtonPlay, ButtonAdv, Dist, Angle, ...
-          Volts, Current, Temp, Charge, ~, pCharge] = AllSensorsReadRoomba(serPort);
+         [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
     end
-
+    pause(0.1);
     
-    %At this point, it has found a wall/hit something
-
-    % used to keep track of position
+        
+   % To keep track of position         
     initialX = 0;
     initialY = 0;
     currentX = 0;
     currentY = 0;
-    hasStart = 0;
     
     angle = AngleSensorRoomba(serPort);
-    magnitude = DistanceSensorRoomba(serPort);
+    DistanceSensorRoomba(serPort);
 
-    disp(['first time angle is' num2str(angle)]);
+    % To record that whether the robot has returned to the start point
+    returnToStart = 0;
     
-    % stop forward movement
-    %SetFwdVelRadiusRoomba(serPort, 0, inf);
-    pause(0.1);
-    
-    %THIS IS ONLY RUNNING ONCE
-    % line up to move against wall
-    
-    while (Wall==0 || BumpRight == 1 || BumpLeft == 1 || BumpFront == 1)
-        turnAngle(serPort, 0.2, 5);
-      [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-      [Wall]= WallSensorReadRoomba(serPort);
-    end
-    angle = angle + AngleSensorRoomba(serPort);
-    disp(['second time angle is' num2str(angle)]);
-        
-        disp(['outside the loop, currentX is ' num2str(currentX)]);
-        disp(['currentY is ' num2str(currentY)])
-        disp(['magnitude is ' num2str(magnitude)])
-        disp(['angle is ' num2str(angle)])
-        
-        
-        
-
-    % keep track of distance and anglesa
-    % angle = AngleSensorRoomba(serPort);
-    % magnitude = DistanceSensorRoomba(serPort);
-
-    % loop through until you return to starting position
-    
-    
-    
-    
-    while (IsStartPoint(currentX, currentY, initialX,  initialY) == 0 || hasStart == 0)
-        hasStart = 1
-    
-        while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1)
-             SetFwdVelRadiusRoomba(serPort, max_vel, inf);
+    % The main while loop
+    while (1)
+       
+       % The I part: Go straight forward. 
+       % Before this loop, we have to record the original isStartPoint. 
+       % This is to deal with the problem
+       % that sometimes the robot stops at the start point at the
+       % beginning, without going anywhere. We Assume that the robot will
+       % return to the start point only in the middle of I or III part.
+       beforeLoopIsStartPoint = IsStartPoint(currentX, currentY, initialX, initialY);
+       while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1)
+              SetFwdVelRadiusRoomba(serPort, max_vel, inf);
              pause(0.1);
-             %disp('after pause')
               [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-               [Wall]= WallSensorReadRoomba(serPort);
-              disp('point one')
-
-
-        end
-      magnitude = DistanceSensorRoomba(serPort);
-      currentX = currentX + magnitude * cos(angle);
-      currentY = currentY + magnitude * sin(angle);
-        disp('after first loop')
-        disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])
-        
-        while(BumpRight==1 || BumpLeft==1 || BumpFront == 1)
-            turnAngle(serPort, 0.2, 5);
-             [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-        disp('point two')
-
-           
-        end
-
-        SetFwdVelRadiusRoomba(serPort, 0, inf);
-        while (Wall == 0 && (BumpRight==0 || BumpLeft==0 || BumpFront==0 ))
-            turnAngle(serPort, 0.2, -5);
-            travelDist(serPort, 0.025, 0.01);
-            %SetFwdVelRadiusRoomba(serPort, max_vel, -1);
-            [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-            [Wall]= WallSensorReadRoomba(serPort);
-             disp('inside third loop')
-
-        end
-       angle = angle + AngleSensorRoomba(serPort);
-
-
-       while (BumpRight==0 && BumpLeft==0 && BumpFront == 0 && Wall == 1 && ...
-            IsStartPoint(currentX, currentY, initialX,  initialY) == 0)
-             SetFwdVelRadiusRoomba(serPort, max_vel, inf);
-             pause(0.1);
-             %disp('after pause')
-              [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-               [Wall]= WallSensorReadRoomba(serPort);
-              disp('point one')
+               [Wall]= WallSensorReadRoomba(serPort);   
             magnitude = DistanceSensorRoomba(serPort);
             currentX = currentX + magnitude * cos(angle);
             currentY = currentY + magnitude * sin(angle);
+            
+            % If the robot returns to the start point in this loop, then
+            % set returnToStart to 1 and break out of the main
+            % loop. Program ends.
+            if (beforeLoopIsStartPoint == 0 ...
+                    && IsStartPoint(currentX, currentY, initialX, initialY) == 1)
+                returnToStart = 1;
+                break
+            end
+       end
+       if(returnToStart == 1)
+           break
+       end
 
+        % The II Part: Turn left until there is no bump detected.
+        % Note that in this part, the robot didn't go any further, so
+        % there is no way that the robot returns to the start point after
+        % this Part.
+        while(BumpRight==1 || BumpLeft==1 || BumpFront == 1)
+            turnAngle(serPort, 0.2, 5);
+            [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
         end
         
+        angle = angle + AngleSensorRoomba(serPort);
         
-        
-        %magnitude = DistanceSensorRoomba(serPort);
-        %currentX = currentX + magnitude * cos(angle);
-        %currentY = currentY + magnitude * sin(angle);
-        disp('after third loop')
-        disp([num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])   
-
-
-
-        disp(['inside the loop, currentX is ' num2str(currentX)]);
-        disp(['currentY is ' num2str(currentY)])
-        disp(['angle is ' num2str(angle)])
-        
-       
-
-
-
-
+        % The III Part: To find the wall.
+        % Since the robot has to walk along the wall, so when the wall
+        % sensor is 0, it has to find the wall. 
+        beforeLoopIsStartPoint = IsStartPoint(currentX, currentY, initialX, initialY);
+        while (Wall == 0 && (BumpRight==0 || BumpLeft==0 || BumpFront==0 ))
+            
+            % Turn little left and then go little further.
+            turnAngle(serPort, 0.2, -5);
+            travelDist(serPort, 0.05, 0.01);
+            [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
+            [Wall]= WallSensorReadRoomba(serPort);
+            angle = angle + AngleSensorRoomba(serPort);
+            magnitude = DistanceSensorRoomba(serPort);
+            currentX = currentX + magnitude * cos(angle);
+            currentY = currentY + magnitude * sin(angle);
+            
+            % If the robot returns to the start point in this loop, then
+            % set returnToStart to 1 and break out of the main
+            % loop. Program ends.
+            if (beforeLoopIsStartPoint == 0 ...
+                && IsStartPoint(currentX, currentY, initialX, initialY) == 1)
+                returnToStart = 1;
+                break
+            end
+        end
+       if(returnToStart == 1)
+           break
+       end
     end
     
-    disp(['outside the loop, currentX is ' num2str(currentX)]);
-    disp(['currentY is ' num2str(currentY)])
-    disp(['hasStart is ' num2str(hasStart)])
 
 end
-    
-    
-    
+
+% To test whether the current point is close enouth to the start point
 function isStartPoint = IsStartPoint(currentX, currentY, initialX, initialY)
     isStartPoint ...
-        = (currentX - initialX)^2 + (currentY - initialY)^2 < 0.05
+        = (currentX - initialX)^2 + (currentY - initialY)^2 < 0.005;
 end
   
  
