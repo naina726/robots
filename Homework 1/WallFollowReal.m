@@ -6,13 +6,10 @@
 % Homework 1
 %**********************************************
 
+
 function WallFollowReal(serPort)
-   % Set the max Velocity 
-   max_vel = 0.4;
    
    [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
-   [Wall]= WallSensorReadRoomba(serPort);
-   disp(['zero' num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])
 
     % Move EVE forward until she hits a wall
     while (BumpRight==0 && BumpLeft==0 && BumpFront == 0)
@@ -22,7 +19,6 @@ function WallFollowReal(serPort)
     end
     pause(0.1);
     
-    disp(['zero2' num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])
 
         
    % To keep track of position         
@@ -30,6 +26,8 @@ function WallFollowReal(serPort)
     initialY = 0;
     currentX = 0;
     currentY = 0;
+
+
     
     angle = AngleSensorRoomba(serPort);
     DistanceSensorRoomba(serPort);
@@ -40,31 +38,35 @@ function WallFollowReal(serPort)
     % The main while loop
     while (1)
        
-       % The I part: Go straight forward. 
+       % The I part: Go straight and turn right untill it hits a wall.
        % Before this loop, we have to record the original isStartPoint. 
        % This is to deal with the problem
        % that sometimes the robot stops at the start point at the
        % beginning, without going anywhere. We Assume that the robot will
-       % return to the start point only in the middle of I or III part.
+       % return to the start point only in the middle of part I.
        beforeLoopIsStartPoint = IsStartPoint(currentX, currentY, initialX, initialY);
+       
+       % Keep track of the turn right times in a loop. Each time the robot turns right, 
+       % the angle will be larget than last time.
        turnRightTimes = 0
        while (BumpRight==0 && BumpLeft==0 && BumpFront == 0)
             % Turn little right and then go little further.
             turnRightTimes = turnRightTimes+1
             travelDist(serPort, 0.1, 0.1);
             magnitude = DistanceSensorRoomba(serPort);
+            currentX = currentX + magnitude * cos(angle);
+            currentY = currentY + magnitude * sin(angle);
 
             [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
             if (BumpRight == 1 || BumpLeft == 1 || BumpFront == 1)
                 break;
             end
-            turnAngle(serPort, min(0.05+0.03*turnRightTimes, 0.2), -1*(turnRightTimes+10));
+            turnAngle(serPort, min(0.05+0.03*turnRightTimes, 0.2), -1*(turnRightTimes+7));
             turningAngle = AngleSensorRoomba(serPort);
             angle = angle + turningAngle
             disp(['turning angle is ' num2str(turningAngle)])
 
-            currentX = currentX + magnitude * cos(angle);
-            currentY = currentY + magnitude * sin(angle);
+
             
             % If the robot returns to the start point in this loop, then
             % set returnToStart to 1 and break out of the main
@@ -76,7 +78,6 @@ function WallFollowReal(serPort)
             end
        end
        
-       disp(['first' num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])
 
        if(returnToStart == 1)
            break
@@ -91,7 +92,7 @@ function WallFollowReal(serPort)
             turnAngle(serPort, 0.05, 2);
             [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
         end
-        disp(['second' num2str(BumpRight) num2str(BumpLeft) num2str(BumpFront) num2str(Wall)])
+
 
         
         angle = angle + AngleSensorRoomba(serPort);
