@@ -52,14 +52,17 @@ function WallFollowReal(serPort)
             % Turn little right and then go little further.
             turnRightTimes = turnRightTimes+1
             travelDist(serPort, 0.1, 0.1);
-            angle = angle + AngleSensorRoomba(serPort);
+            magnitude = DistanceSensorRoomba(serPort);
 
             [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
             if (BumpRight == 1 || BumpLeft == 1 || BumpFront == 1)
                 break;
             end
-            turnAngle(serPort, 0.05, -1*(turnRightTimes+1));
-            magnitude = DistanceSensorRoomba(serPort);
+            turnAngle(serPort, min(0.05+0.03*turnRightTimes, 0.2), -1*(turnRightTimes+10));
+            turningAngle = AngleSensorRoomba(serPort);
+            angle = angle + turningAngle
+            disp(['turning angle is ' num2str(turningAngle)])
+
             currentX = currentX + magnitude * cos(angle);
             currentY = currentY + magnitude * sin(angle);
             
