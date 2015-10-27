@@ -1,0 +1,37 @@
+
+main:
+	Initialize()
+	go_random()
+	while(time<120)
+		if IsExplored(currentPoint):
+			go_random()
+			continue
+		followBound()
+	drawMap()
+
+
+IsExplored():
+	return isExplored
+
+Initialize():
+	initial100*100Matrix
+
+
+
+followBound():
+	followTheBoundUntilReachStartPoint()
+	updateInside()
+
+go_random():
+	randomly_choose_angle()
+	turnAngle()
+	goStraightFwdUntilHit()
+	updatePoint()
+
+
+UpdateInside():
+	updateInsidePointOrNot()
+
+drawMap():
+	draw_a_map_according_to_marks()
+
