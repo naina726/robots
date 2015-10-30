@@ -15,7 +15,7 @@ function twoDMap(serPort)
     DistanceSensorRoomba(serPort);
     DistanceSensorRoomba(serPort);
     initializeMatrix();
-    fig = figure;
+
     %firstTime = 1;
 
     %goRandom(serPort);
@@ -75,6 +75,21 @@ function isObstacle = isObstacle(currentX, currentY)
 end
 
 
+function aroundObstacleNum = AroundObstacle(currentX, currentY)
+    global positionMatrix
+    aroundObstacleNum = false;
+    % [roundX, roundY] = transCoordinate(currentX, currentY);
+    %  positionMatrix(roundX, roundY) == 1 || positionMatrix(roundX-1, roundY) == 1 || ...
+    %     positionMatrix(roundX+1, roundY) == 1 || positionMatrix(roundX, roundY-1) == 1 || ...
+    %     positionMatrix(roundX, roundY+1) == 1
+    %     aroundObstacle = true;
+    % else
+    %     aroundObstacle = false;
+    % end
+
+end
+
+
 
 function [matrixPositionX, matrixPositionY] = transCoordinate(inputX, inputY)
     matrixPositionX = round(inputX / 0.3) + 20;
@@ -83,7 +98,7 @@ end
 
 
 function followTheBound(serPort, startX, startY)
-  global currentAngle currentX currentY
+  global currentAngle currentX currentY notUpdatedTimes
   disp(['the startX is ' num2str(startX) ' and startY is ' num2str(startY)])
     max_vel = 0.2;
    [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
@@ -105,11 +120,11 @@ function followTheBound(serPort, startX, startY)
             magnitude = DistanceSensorRoomba(serPort);
             currentX = currentX + magnitude * cos(currentAngle);
             currentY = currentY + magnitude * sin(currentAngle);
-            if isObstacle(currentX, currentY)
-                obstacleNum = obstacleNum + 1;
-            else
-                obstacleNum = 0;
-            end
+            % if AroundObstacle(currentX, currentY)
+            %     obstacleNum = obstacleNum + 1;
+            % else
+            %     obstacleNum = 0;
+            % end
             updateMatrix(currentX, currentY, 1)
             %hasStraight = 1;
 
@@ -129,10 +144,14 @@ function followTheBound(serPort, startX, startY)
        end
 
        % This means that the wall has been followed before
-       disp(['obstacleNum is ' num2str(obstacleNum)])
-       if obstacleNum > 100
-        return
-       end
+       % disp(['obstacleNum is ' num2str(obstacleNum)])
+       % if obstacleNum > 100
+       %  return
+       % end
+        disp(['1 in followbound , not update is ' num2str(notUpdatedTimes)])
+       if notUpdatedTimes > 60
+            return
+        end
 %        if hasStraight == 1
 %             startStraight = 1;
 %        end
@@ -159,11 +178,11 @@ function followTheBound(serPort, startX, startY)
             currentX = currentX + magnitude * cos(currentAngle);
             currentY = currentY + magnitude * sin(currentAngle);
             
-            if isObstacle(currentX, currentY)
-                obstacleNum = obstacleNum + 1;
-            else
-                obstacleNum = 0;
-            end
+            % if AroundObstacle(currentX, currentY)
+            %     obstacleNum = obstacleNum + 1;
+            % else
+            %     obstacleNum = 0;
+            % end
             
             updateMatrix(currentX, currentY, 1)
             
@@ -184,10 +203,15 @@ function followTheBound(serPort, startX, startY)
             return
        end
 
-       disp(['obstacleNum is ' num2str(obstacleNum)])
-       if obstacleNum > 100
+       % disp(['obstacleNum is ' num2str(obstacleNum)])
+       % if obstacleNum > 100
+       %      return
+       % end
+
+        disp(['2 in followbound , not update is ' num2str(notUpdatedTimes)])
+       if notUpdatedTimes > 60
             return
-       end
+        end
        whileLoopIndicaters = whileLoopIndicaters + 1;
 
        %startMoving = 1;
@@ -211,7 +235,20 @@ end
 
 function goRandom(serPort)
     global currentAngle
-    randomAngle = round(45 * rand);
+    [BumpRight,BumpLeft,a,b,c,BumpFront] = BumpsWheelDropsSensorsRoomba(serPort);
+    [Wall]= WallSensorReadRoomba(serPort);
+    randomAngle = 0;
+    if BumpRight == 1 || Wall == 1
+        randomAngle = round(120 * rand + 30);
+    elseif BumpFront == 1
+        randomAngle = round(120 * rand + 120);
+    elseif BumpLeft == 1
+        randomAngle = 0 - round(120 * rand + 30);
+    else
+        randomAngle = round(360 * rand);
+    end
+
+    %randomAngle = round(45 * rand);
     turnAngle(serPort, 0.2, randomAngle);
     currentAngle = currentAngle + AngleSensorRoomba(serPort);
     goStraight(serPort);
