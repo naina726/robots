@@ -1,0 +1,15 @@
+first_part(reflection and convex hull):
+input:  description of the obstacles files(same format)
+output: description of the obstacles files(same format)
+
+seconde_part(cross out the invalid visible lines):
+input: two files A, B, A is the description of the obstacles files, B is newly created visible lines
+output: description of every valid visible lines
+
+third_part(dijkstra algorithm):
+input: description of every valid visible lines(same format)
+output: description of the shortest path(same format)
+
+
+forth_part(drawing part):
+whatever you want~
