@@ -9,10 +9,15 @@ from Tkinter import *
 import time
 import Queue
 
+inputObsFile = 'obj.txt'
+inputDistFile = 'dis.txt'
+outputFile = 'sp.txt'
+startPointName = '0'
+goalPointName = '1'
 
 def main():
-    '''# temporary main to test this code'''
-    second_part('samplepoints.txt','distances.txt','A','J')
+
+    second_part(inputObsFile, inputDistFile,startPointName,goalPointName)
 
  
 def second_part(objects_file, lines_file, source, destination):
@@ -50,11 +55,11 @@ def second_part(objects_file, lines_file, source, destination):
     # run dijkstras algorithm
     di = Dijkstras(cities, source, destination)
     di.dijkstras()
-    
+
     # shortestpath.txt will be the output file used in MATLAB
         # format: x y 
             # one point per line
-    open_file = open('shortestpath.txt','w')
+    open_file = open(outputFile,'w')
     di.writePath(open_file,cities[destination])
     
 # Vertex class
