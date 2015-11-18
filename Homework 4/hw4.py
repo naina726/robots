@@ -388,10 +388,7 @@ class Dijkstras():
         
 
 
-
-def plot_obstacle(w, *infiles):
-
-    # assuming all files have the same format
+def plot_obstacle(*infiles):
     
     master = Tk()
     w = Canvas(master, width=5000, height=5000)
@@ -401,7 +398,7 @@ def plot_obstacle(w, *infiles):
     for filename in infiles:
         infile = open(filename, 'r')
         num_ob = infile.readline()
-        num_ob = num_obj.split()
+        num_ob = num_ob.split()
         # for files with obstacles
         if len(num_ob) == 1:
             num_ob = int(num_ob[0])
@@ -433,12 +430,13 @@ def plot_obstacle(w, *infiles):
                 num_ob = num_ob.split()
             wid =  wid + 2
             time.sleep(2)
-        # for giles with lines formatted x1 y1            
+        # for files with lines formatted x1 y1            
         else:
             points = []
+
             while(len(num_ob)>0):
-                num_ob[0] = 400 + float(num_oj[i])*40
-                num_ob[1] = 150 + float(num_ob[i])*40
+                num_ob[0] = 400 + float(num_ob[0])*40
+                num_ob[1] = 150 + float(num_ob[1])*40
                 points.append((num_ob[0],num_ob[1]))
                 num_ob = infile.readline()
                 num_ob = num_ob.split()
@@ -448,7 +446,6 @@ def plot_obstacle(w, *infiles):
             wid = wid + 2
             time.sleep(2)
     mainloop()
-
 
 
 
@@ -608,7 +605,7 @@ goalPointName = '1'
   
 second_part(inputObsFile, inputDistFile,startPointName,goalPointName)
 
-
+plot_obstacle(outputFile)
 
 
 #originalX = [ele[0],ele[2] for ele in legalLines]
