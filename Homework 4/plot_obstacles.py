@@ -7,10 +7,11 @@ Created on Mon Nov 16 15:41:42 2015
 
 from Tkinter import *
 import time
+import Queue
 
 def main():
 
-    plot_obstacle(w, "points.txt")
+    second_part('samplepoints.txt','distances.txt','A','J')
 
 def second_part(objects_file, lines_file, source, destination):
             
@@ -28,16 +29,17 @@ def second_part(objects_file, lines_file, source, destination):
         city1 = line[0]
         city2 = line[1]
         cost = float(line[2])
-        cities[city1].addAdj(cities[city2])
-        cities[city1].addDist(cost)
-        cities[city2].addAdj(cities[city1])
-        cities[city2].addDist(cost)
+        cities[city1].addAdj(cities[city2],cost)
+        #cities[city1].addDist(cost)
+        cities[city2].addAdj(cities[city1],cost)
+        #cities[city2].addDist(cost)
         
     connCities.close()
     
     di = Dijkstras(cities, source, destination)
     di.dijkstras()
-    di.getPathLength()
+    open_file = open('shortestpath.txt','w')
+    di.writePath(open_file,cities[destination])
     
 class Vertex():
     def __init__(self, name, xcoord, ycoord):
@@ -48,9 +50,9 @@ class Vertex():
         self.distances = []
         self.dist = 0
         self.path = None
-    def addAdj(v, distance):
-        adj.append(v)
-        distances.append(distance)
+    def addAdj(self, v, distance):
+        self.adj.append(v)
+        self.distances.append(distance)
     def getName():
         return city
 
@@ -61,32 +63,31 @@ class Dijkstras():
         self.destinName = destination
         self.source = cities[source]
         self.destination =  cities[destination]
-    def getSource():
+    def getSource(self):
         return self.source
-    def getDestination():
+    def getDestination(self):
         return self.destination
-    def dijkstras():
-        q = []
-        for v in cities.values():
+    def dijkstras(self):
+        q = Queue.PriorityQueue()
+        for v in self.cities.values():
             v.dist = float('inf')
         self.source.dist = 0
-        heappush(q, source)
-        while len(q) > 0:
-            v = heappop(q)
-            for i in len(v.adj):
+        q.put(self.source)
+        while q.qsize() > 0:
+            v = q.get()
+            for i in range(len(v.adj)):
                 if v.adj[i].dist == float('inf'):
                     v.adj[i].dist = v.dist + v.distances[i]
                     v.adj[i].path = v;
-                    heappush(q, v.adj[i])
-    def getPathLength():
-        return destination.dist
-    def writePath(path_file, v):
+                    q.put(v.adj[i])
+
+    def writePath(self,path_file, v):
         if(v.path!=None):
-            writePath(path_file, v.path)
+            self.writePath(path_file, v.path)
             path_file.write("\n")
-        path_file.write(v.x)
+        path_file.write(str((v.x-150)/40))
         path_file.write(" ")
-        path_file.write(v.y)
+        path_file.write(str((v.y-400)/40))
         
             
         
