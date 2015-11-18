@@ -85,9 +85,9 @@ class Dijkstras():
         if(v.path!=None):
             self.writePath(path_file, v.path)
             path_file.write("\n")
-        path_file.write(str((v.x-150)/40))
+        path_file.write(str((v.x-400)/40))
         path_file.write(" ")
-        path_file.write(str((v.y-400)/40))
+        path_file.write(str((v.y-150)/40))
         
             
         
