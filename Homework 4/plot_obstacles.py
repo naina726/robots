@@ -9,15 +9,10 @@ from Tkinter import *
 import time
 import Queue
 
-inputObsFile = 'obj.txt'
-inputDistFile = 'dis.txt'
-outputFile = 'sp.txt'
-startPointName = '0'
-goalPointName = '1'
 
-def main():
-
-    second_part(inputObsFile, inputDistFile,startPointName,goalPointName)
+#def main():
+#    '''# temporary main to test this code'''
+#    second_part('samplepoints.txt','distances.txt','A','J')
 
  
 def second_part(objects_file, lines_file, source, destination):
@@ -55,11 +50,11 @@ def second_part(objects_file, lines_file, source, destination):
     # run dijkstras algorithm
     di = Dijkstras(cities, source, destination)
     di.dijkstras()
-
+    
     # shortestpath.txt will be the output file used in MATLAB
         # format: x y 
             # one point per line
-    open_file = open(outputFile,'w')
+    open_file = open('shortestpath.txt','w')
     di.writePath(open_file,cities[destination])
     
 # Vertex class
@@ -114,6 +109,8 @@ class Dijkstras():
 
 # takes in file names
 # preferably in order in which they need to be placed on the GUI
+def main():
+    plot_obstacle('shortestpath.txt')
 def plot_obstacle(*infiles):
     
     master = Tk()
@@ -124,7 +121,7 @@ def plot_obstacle(*infiles):
     for filename in infiles:
         infile = open(filename, 'r')
         num_ob = infile.readline()
-        num_ob = num_obj.split()
+        num_ob = num_ob.split()
         # for files with obstacles
         if len(num_ob) == 1:
             num_ob = int(num_ob[0])
@@ -148,7 +145,7 @@ def plot_obstacle(*infiles):
             while(len(num_ob) >0):
                 for i in range(len(num_ob)):
                     if i % 2 == 0:
-                        num_ob[i] = 400 + float(num_oj[i])*40
+                        num_ob[i] = 400 + float(num_ob[i])*40
                     else:
                         num_ob[i] = 150 + float(num_ob[i])*40
                 w.create_line(num_ob[0], num_ob[1], num_ob[2], num_ob[3], width=wid)
@@ -160,14 +157,13 @@ def plot_obstacle(*infiles):
         else:
             points = []
             while(len(num_ob)>0):
-                num_ob[0] = 400 + float(num_oj[i])*40
-                num_ob[1] = 150 + float(num_ob[i])*40
+                num_ob[0] = 400 + float(num_ob[0])*40
+                num_ob[1] = 150 + float(num_ob[1])*40
                 points.append((num_ob[0],num_ob[1]))
                 num_ob = infile.readline()
                 num_ob = num_ob.split()
             for i in range(len(points)-1):
                 w.create_line(points[i][0], points[i][1], points[i+1][0], points[i+1][1], width=wid)
-            w.create_line(points[0][0], points[0][1], points[-1][0], points[-1][1], width=wid)
             wid = wid + 2
             time.sleep(2)
     mainloop()
