@@ -9,20 +9,33 @@ from Tkinter import *
 import time
 import Queue
 
-def main():
 
+def main():
+    '''# temporary main to test this code'''
     second_part('samplepoints.txt','distances.txt','A','J')
 
+ 
 def second_part(objects_file, lines_file, source, destination):
+    '''objects_file - file with vertices of grown obstacles
+            format: nodeName x-coordinate y-coordinate
+        lines_file - file with edges and their costs
+            format: nodeName nodeName cost
+        source: nodeName (type: string)
+        destination: nodeName (type: string)
+        
+        source and destination must be in object_file and lines_file
+    '''
             
     obj = open(objects_file,'r')
     cities = {}
     
+    # create vertices for each vertex of the obstacles
     for line in obj:
         line = line.split()
         cities[line[0]] = Vertex(line[0],400+float(line[1])*40,150+float(line[2])*40)
     obj.close()
     
+    # add edges coming out of each vertex
     connCities = open(lines_file, 'r')
     for line in connCities:
         line = line.split()
@@ -30,17 +43,21 @@ def second_part(objects_file, lines_file, source, destination):
         city2 = line[1]
         cost = float(line[2])
         cities[city1].addAdj(cities[city2],cost)
-        #cities[city1].addDist(cost)
         cities[city2].addAdj(cities[city1],cost)
-        #cities[city2].addDist(cost)
         
     connCities.close()
     
+    # run dijkstras algorithm
     di = Dijkstras(cities, source, destination)
     di.dijkstras()
+    
+    # shortestpath.txt will be the output file used in MATLAB
+        # format: x y 
+            # one point per line
     open_file = open('shortestpath.txt','w')
     di.writePath(open_file,cities[destination])
     
+# Vertex class
 class Vertex():
     def __init__(self, name, xcoord, ycoord):
         self.city = name
@@ -56,6 +73,7 @@ class Vertex():
     def getName():
         return city
 
+# Dijkstras
 class Dijkstras():
     def __init__(self, cities, source, destination):
         self.cities = cities
@@ -63,40 +81,35 @@ class Dijkstras():
         self.destinName = destination
         self.source = cities[source]
         self.destination =  cities[destination]
-    def getSource(self):
-        return self.source
-    def getDestination(self):
-        return self.destination
+
     def dijkstras(self):
         q = Queue.PriorityQueue()
-        for v in self.cities.values():
-            v.dist = float('inf')
+        for x in self.cities.values():
+            x.dist = float('inf')
         self.source.dist = 0
         q.put(self.source)
         while q.qsize() > 0:
-            v = q.get()
-            for i in range(len(v.adj)):
-                if v.adj[i].dist == float('inf'):
-                    v.adj[i].dist = v.dist + v.distances[i]
-                    v.adj[i].path = v;
-                    q.put(v.adj[i])
+            w = q.get()
+            for i in range(len(w.adj)):
+                if w.adj[i].dist == float('inf'):
+                    w.adj[i].dist = w.dist + w.distances[i]
+                    w.adj[i].path = w;
+                    q.put(w.adj[i])
 
+    # takes in an object file, sourceVertex and destinationVertex
+    # writes into shortest path file
     def writePath(self,path_file, v):
-        if(v.path!=None):
+        if (v.path!=None):
             self.writePath(path_file, v.path)
             path_file.write("\n")
         path_file.write(str((v.x-400)/40))
         path_file.write(" ")
         path_file.write(str((v.y-150)/40))
         
-            
-        
 
-
-
-def plot_obstacle(w, *infiles):
-
-    # assuming all files have the same format
+# takes in file names
+# preferably in order in which they need to be placed on the GUI
+def plot_obstacle(*infiles):
     
     master = Tk()
     w = Canvas(master, width=5000, height=5000)
@@ -138,7 +151,7 @@ def plot_obstacle(w, *infiles):
                 num_ob = num_ob.split()
             wid =  wid + 2
             time.sleep(2)
-        # for giles with lines formatted x1 y1            
+        # for files with lines formatted x1 y1            
         else:
             points = []
             while(len(num_ob)>0):
