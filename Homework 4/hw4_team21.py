@@ -7,7 +7,8 @@
 # Team leader: Yiqing Cui(yc3121)
 # Team members: Jasleen Nuno (jn2465)  Naina Prasad (np2302)
 # Usage: Set the input obstacle file and input start_and_goal_point file name
-# in variable obstaclesFile and startGoalFile.
+# in variable obstaclesFile and startGoalFile. Then type python hw4_team21.py
+# 
 ##########################################################
  
 
@@ -20,9 +21,14 @@ import matplotlib.pyplot as plt
 import sys
 import Queue
 
-
+# Warning!!!!!!------------user should specify these two files----------------
 startGoalFile = 'testStartGoal.txt'
 obstaclesFile = 'testObstacles.txt'
+
+
+
+
+
 outputObjectFile = 'obj.txt'
 outputDistanceFile = 'dis.txt'
 inputObsFile = 'obj.txt'
@@ -461,7 +467,7 @@ if __name__ == "__main__":
     master = Tk()
     w = Canvas(master, width=5000, height=5000)
     w.pack()
-
+    plot_obstacle(w,start_point, goal_point, obstaclesFile)
     plot_obstacle(w,start_point, goal_point, grownObstaclesFile)
     plot_obstacle(w,start_point, goal_point, generatedVisibleLineFile)
     plot_obstacle(w,start_point, goal_point, outputFile)
