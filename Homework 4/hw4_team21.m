@@ -4,7 +4,7 @@ function hw4_team21(serPort);
     % "shortestpath.txt"
 
     % opens the file to read
-    fid = fopen('shortestPath.txt');
+    fid = fopen('sp.txt');
     tmp = fscanf(fid,'%f');
     fclose(fid);
     % reads in the start point
