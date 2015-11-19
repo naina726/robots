@@ -111,11 +111,13 @@ class Dijkstras():
 # preferably in order in which they need to be placed on the GUI
 def main():
     plot_obstacle('points.txt','shortestpath.txt')
-def plot_obstacle(*infiles):
+def plot_obstacle(*infiles, start_point, end_point):
     
     master = Tk()
     w = Canvas(master, width=5000, height=5000)
     w.pack()
+    w.create_oval((400+start_point[0]*40)-5,(150+start_point[1]*40)+5,(400+start_point[0]*40)+5,(150+start_point[1]*40)-5,width=1,fill='green')
+    w.create_oval((400+end_point[0]*40)-5,(150+end_point[1]*40)+5,(400+end_point[0]*40)+5,(150+end_point[1]*40)-5,width=1,fill='red')
 
     wid = 2
     for filename in infiles:
@@ -165,8 +167,8 @@ def plot_obstacle(*infiles):
             for i in range(len(points)-1):
                 w.create_line(points[i][0], points[i][1], points[i+1][0], points[i+1][1], width=wid)
             wid = wid + 2
-            w.create_oval(points[0][0]-5,points[0][1]+5,points[0][0]+5,points[0][1]-5,width=1,fill='green')
-            w.create_oval(points[-1][0]-5,points[-1][1]+5,points[-1][0]+5,points[-1][1]-5,width=1,fill='red')
+            #w.create_oval(points[0][0]-5,points[0][1]+5,points[0][0]+5,points[0][1]-5,width=1,fill='green')
+            #w.create_oval(points[-1][0]-5,points[-1][1]+5,points[-1][0]+5,points[-1][1]-5,width=1,fill='red')
             time.sleep(2)
     mainloop()
 main()
