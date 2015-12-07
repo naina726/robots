@@ -43,10 +43,10 @@ function hw3_team_21(serPort)
         %     disp('end go random')
         %     firstTime = 0;
         % for debug
-        while 1
-            followTheBound(serPort, currentX, currentY)
-            pause(5)
-        end
+        % while 1
+        %     followTheBound(serPort, currentX, currentY)
+        %     pause(5)
+        % end
 
 
         % else
