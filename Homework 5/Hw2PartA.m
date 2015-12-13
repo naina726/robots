@@ -1,37 +1,45 @@
-function [] = Hw2PartA();
     
 % read initial image
 image = imread('im6.png')
 [m,n] = size(image);
+disp(m)
+disp(n)
+
+
+
+pichsv = rgb2hsv(image);
+
+% doorLayer = pichsv(:,:,1)>0.56 &pichsv(:,:,1)<0.675;
 
 direction = 0;
 
 for i = 1:(n/2)
     column_count = 0;
     for j= 1:m
-        if image(j,i,1) > 63 && image(j,i,1) < 73:
-            if image(j,i,2) > 79 && image(j,i,2) < 89:
-                if image(j,i,3) > 92 && image(j,i,3) < 103:
-                    column_count = column_count + 1;
-    if (column_count/n) > 0.5
+        if pichsv(j,i,1) > 0.56 && pichsv(j,i,1) < 0.675
+            column_count = column_count + 1;
+        end
+    end
+    if column_count > m / 2
         direction = i;
         break;
+    end
     column_count = 0;       
     for j= 1:m
-        if image(j,n-i,1) > 63 && image(j,n-i,1) < 73:
-            if image(j,n-i,2) > 79 && image(j,n-i,2) < 89:
-                if image(j,n-i,3) > 92 && image(j,n-i,3) < 103:
+        if image(j,n-i,1) > 0.56 && image(j,n-i,1) < 0.675:
                     column_count = column_count + 1;
-                    
-     if (column_count/n) > 0.5
+        end
+    end
+     if column_count > m / 2
          direction = i;
          break;
-         
-if direction < (n/2)
+     end
+disp(direction) 
+%if direction < (n/2)
     % robot turns left
-else
+%else
     % robot turns right
     
-Hw5Part2(serPort);
+%Hw5Part2(serPort);
 
-end
+%end
