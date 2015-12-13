@@ -29,55 +29,77 @@ function [] = hw5PartI(serPort);
 
 	originalCenterR = mean2(areaResult(:,1));
 	originalCenterC = mean2(areaResult(:,2));
+	disp(originalCenterR);
+	disp(originalCenterC);
 	showHilight(totalR, totalC, areaResult);
-	return;
-	maintain the same distance
+
+	pause(1);
+
+	%[object] = findLargestBlob(picvalue);
+	%showHilight(totalR, totalC, object);
+
+	%return;
+	% maintain the same distance
 	while 1
-		pause(5);
-	    [object] = findLargestBlob();
+		%pause(2);
+	    [object] = findLargestBlob(picvalue);
 	    currentCenterC = mean2(object(:,2));
+	    disp(['currentCenterC is ' num2str(currentCenterC)]);
+
 
 	    % adjust the angle
-		while abs(currentCenterC - originalCenterC) > 10
+		if abs(currentCenterC - originalCenterC) > 30
+		%while abs(currentCenterC - originalCenterC) > 30
 			 if currentCenterC > originalCenterC
-			 	turnAngle(serPort, 0.05, 2);
+			 	turnAngle(serPort, 0.025, -2);
 			 else
-			 	turnAngle(serPort, 0.05, -2);
+			 	turnAngle(serPort, 0.025, 2);
 			 end
-			[object] = findLargestBlob();
+			[object] = findLargestBlob(picvalue);
+			[area, ~] = size(object);
+			while area <= 50
+			 	turnAngle(serPort, 0.2, -20);
+			 	[object] = findLargestBlob(picvalue);
+			 	[area, ~] = size(object);
+			end
 	    	currentCenterC = mean2(object(:,2));
 	    	showHilight(totalR, totalC, object);
-
 		end
 
 		[area, ~] = size(object);
 		% adjust the distance
-		while abs(area - originalArea) > 100
+		if abs(area - originalArea) > 500
+		%while abs(area - originalArea) > 100
 			if area > originalArea
-				travelDist(serPort, 0.2, -0.25);
+				travelDist(serPort, 0.1, -0.05);
 			else
-				travelDist(serPort, 0.2, 0.25);
+				travelDist(serPort, 0.1, 0.05);
 			end
-			[object] = findLargestBlob();
+			[object] = findLargestBlob(picvalue);
 			[area, ~] = size(object);
-	    	currentCenterC = mean2(object(:,2));
-	    	showHilight(totalR, totalC, object);
-
-		end
-
-
-		% adjust the angle again
-		while abs(currentCenterC - originalCenterC) > 5
-			if currentCenterC > originalCenterC
-			 	turnAngle(serPort, 0.05, 5);
-			else
-			 	turnAngle(serPort, 0.05, -5);
+			while area <= 50
+			 	turnAngle(serPort, 0.2, -20);
+			 	[object] = findLargestBlob(picvalue);
+			 	[area, ~] = size(object);
 			end
-			[object] = findLargestBlob();
 	    	currentCenterC = mean2(object(:,2));
 	    	showHilight(totalR, totalC, object);
 
 		end
+
+
+		% % adjust the angle again
+		% while abs(currentCenterC - originalCenterC) > 5
+		% 	if currentCenterC > originalCenterC
+		% 	 	turnAngle(serPort, 0.05, 5);
+		% 	else
+		% 	 	turnAngle(serPort, 0.05, -5);
+		% 	end
+		% 	[object] = findLargestBlob(picvalue);
+	 %    	currentCenterC = mean2(object(:,2));
+	 %    	showHilight(totalR, totalC, object);
+
+		% end
 
 	end
 
@@ -91,13 +113,13 @@ function [result, resultVisited] = findArea(startR, startC, hsvpic, visited)
 	queue(1:qLength, 1:2) = 0;
 	%visited(1:m,1:n) = 0;
 	hsvvalue = hsvpic(startR, startC);
-	disp(['hsv value is' num2str(hsvvalue)]);
+	%disp(['hsv value is' num2str(hsvvalue)]);
 	startP = 1;
 	endP = 2;
 	queue(startP, 1) = startR;
 	queue(startP, 2) = startC;
     visited(startR, startC) = 1;
-    hsvThreshold = 0.05;
+    hsvThreshold = 0.04;
     while startP < endP
     	tempR = queue(startP, 1);
     	tempC = queue(startP, 2);
@@ -182,31 +204,35 @@ end
 
 
 
-function [result] = findLargestBlob()
+function [result] = findLargestBlob(picvalue)
 	image = imread('http://192.168.0.101/img/snapshot.cgi?');
+
     pichsv = rgb2hsv(image);
     [totalR, totalC, ~] = size(image);
     currentStartR = 0;
     currentStartC = 0;	
-    visited(1:m,1:n) = 0;
+    visited(1:totalR,1:totalC) = 0;
     maxArea = 0;
     largestArea = [];
+    hsvThreshold = 0.005;
 	for i = 1:totalR
 		for j = 1:totalC
-			if pichsv(i,j,1) == picvalue
+			if abs(pichsv(i,j,1) - picvalue) <= hsvThreshold
 				currentStartR = i;
 				currentStartC = j;
-				if visited(m,n) == 1
+				if visited(i,j) == 1
 					continue
 				end
 				[resultArea, visited] = findArea(currentStartR, currentStartC, pichsv, visited);
 				[area, ~] = size(resultArea);
 				if area > maxArea
 					largestArea = resultArea;
+					maxArea = area;
 				end
 			end
 		end
 	end
+	%disp(area)
 	result = largestArea;
 	% currentCenterC = mean2(areaResult(:,2));
 
